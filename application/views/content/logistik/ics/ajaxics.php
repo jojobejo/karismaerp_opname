@@ -135,5 +135,21 @@
             "aaSorting": [],
             "autoWidth": false,
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+        $("#trackingwil_1").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "aaSorting": [],
+            "autoWidth": false,
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+        $("#trackingwil_2").DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "aaSorting": [],
+            "autoWidth": false,
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+
     });
 </script>

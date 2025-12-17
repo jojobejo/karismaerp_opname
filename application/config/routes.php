@@ -106,6 +106,9 @@ $route['export_compare_allbarang']                  = 'logistik/C_Logistik/expor
 $route['usropname_input']                           = 'logistik/C_Logistik/usropname_input';
 $route['delete_opname/(:any)']                      = 'logistik/C_Logistik/delete_opname/$1';
 $route['data_final_input_opname']                   = 'logistik/C_Logistik/data_final_input_opname';
+$route['master_barang']                             = 'logistik/C_Logistik/master_barang';
+$route['tracking_wilayah']                          = 'logistik/C_Logistik/tracking_wilayah';
+$route['detail_wilayah_opname/(:any)']              = 'logistik/C_Logistik/detail_wilayah_opname/$1';
 
 //LOGISTIK - DO
 $route['logistik']                                  = 'logistik/C_Logistik/delivery_order';

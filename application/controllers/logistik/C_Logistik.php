@@ -1758,6 +1758,38 @@ class C_Logistik extends CI_Controller
         }
     }
 
+    public function master_barang()
+    {
+        $data['page_title']         = 'KARISMA - ICS';
+
+        $this->load->view('partial/main/header.php', $data);
+        $this->load->view('content/logistik/ics/master_barang.php', $data);
+        $this->load->view('partial/main/footer.php');
+    }
+
+    public function tracking_wilayah()
+    {
+        $data['page_title']         = 'KARISMA - ICS';
+
+        $this->load->view('partial/main/header.php', $data);
+        $this->load->view('content/logistik/ics/tracking_wilayah.php', $data);
+        $this->load->view('partial/main/footer.php');
+    }
+
+    public function detail_wilayah_opname($id)
+    {
+        $data['page_title']         = 'KARISMA - ICS';
+        $data['wilayah_id']        = $id;
+
+        $data['wilayah_all']        = $this->M_Logistik->wilayah_inputer_allbarang($id);
+        $data['wilayah_fefo']       = $this->M_Logistik->wilayah_inputer_by_expdate($id);
+
+        $this->load->view('partial/main/header.php', $data);
+        $this->load->view('content/logistik/ics/det_tracking_wilayah.php', $data);
+        $this->load->view('partial/main/footer.php');
+        $this->load->view('content/logistik/ics/ajaxics.php', $data);
+    }
+
     public function final_result_opname()
     {
         $data['page_title']         = 'KARISMA - ICS';

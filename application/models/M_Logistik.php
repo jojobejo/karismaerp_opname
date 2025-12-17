@@ -1009,6 +1009,103 @@ class M_Logistik extends CI_Model
         ORDER BY i.nama_barang;")->result();
     }
 
+    public function wilayah_inputer_allbarang($id)
+    {
+        return $this->db->query("SELECT
+                i.nama_barang,
+                COALESCE(m.kd_system, '-') AS kd_barang,
+                COALESCE(t1.qty_fisik_tim1, 0) AS qty_fisik_tim1,
+                COALESCE(t2.qty_fisik_tim2, 0) AS qty_fisik_tim2,
+                CASE
+                    WHEN COALESCE(t1.qty_fisik_tim1, 0) = COALESCE(t2.qty_fisik_tim2, 0)
+                    THEN 'MATCH'
+                    ELSE 'NOT MATCH'
+                END AS status_opname,
+                CASE
+                    WHEN COALESCE(t1.qty_fisik_tim1, 0) = COALESCE(t2.qty_fisik_tim2, 0)
+                    THEN 'VALID'
+                    ELSE 'CEK ULANG'
+                END AS keterangan
+                FROM (
+                    SELECT DISTINCT nama_barang
+                    FROM tb_ics_opname
+                    WHERE wilayah = $id
+                ) i
+                LEFT JOIN tb_mbarang m 
+                    ON m.nm_barang = i.nama_barang
+                LEFT JOIN (
+                    SELECT nama_barang, SUM(qty) AS qty_fisik_tim1
+                    FROM tb_ics_opname
+                    WHERE tim = '1'
+                    AND wilayah = $id
+                    GROUP BY nama_barang
+                ) t1 ON t1.nama_barang = i.nama_barang
+                LEFT JOIN (
+                    SELECT nama_barang, SUM(qty) AS qty_fisik_tim2
+                    FROM tb_ics_opname
+                    WHERE tim = '2'
+                    AND wilayah = $id
+                    GROUP BY nama_barang
+                ) t2 ON t2.nama_barang = i.nama_barang
+                ORDER BY i.nama_barang; 
+        ")->result();
+    }
+
+    public function wilayah_inputer_by_expdate($id)
+    {
+        return $this->db->query("SELECT
+            i.nama_barang,
+            i.exp_date,
+            COALESCE(m.kd_system, '-') AS kd_barang,
+
+            COALESCE(t1.qty_fisik_tim1, 0) AS qty_fisik_tim1,
+            COALESCE(t2.qty_fisik_tim2, 0) AS qty_fisik_tim2,
+
+            CASE
+                WHEN COALESCE(t1.qty_fisik_tim1, 0) = COALESCE(t2.qty_fisik_tim2, 0)
+                THEN 'MATCH'
+                ELSE 'NOT MATCH'
+            END AS status_opname,
+
+            CASE
+                WHEN COALESCE(t1.qty_fisik_tim1, 0) = COALESCE(t2.qty_fisik_tim2, 0)
+                THEN 'VALID'
+                ELSE 'CEK ULANG'
+            END AS keterangan
+        FROM (
+            SELECT DISTINCT nama_barang, exp_date
+            FROM tb_ics_opname
+            WHERE wilayah = $id
+        ) i
+        LEFT JOIN tb_mbarang m
+            ON m.nm_barang = i.nama_barang
+        LEFT JOIN (
+            SELECT 
+                nama_barang,
+                exp_date,
+                SUM(qty) AS qty_fisik_tim1
+            FROM tb_ics_opname
+            WHERE tim = '1'
+            AND wilayah = $id
+            GROUP BY nama_barang, exp_date
+        ) t1 
+            ON t1.nama_barang = i.nama_barang
+        AND t1.exp_date   = i.exp_date
+        LEFT JOIN (
+            SELECT 
+                nama_barang,
+                exp_date,
+                SUM(qty) AS qty_fisik_tim2
+            FROM tb_ics_opname
+            WHERE tim = '2'
+            AND wilayah = $id
+            GROUP BY nama_barang, exp_date
+        ) t2 
+            ON t2.nama_barang = i.nama_barang
+        AND t2.exp_date   = i.exp_date
+        ORDER BY i.nama_barang, i.exp_date;")->result();
+    }
+
     public function compareinputer($tim)
     {
         // Fisik opname hanya dari User StockOpname 1
@@ -1081,6 +1178,8 @@ class M_Logistik extends CI_Model
 
         return $this->db->query($sql)->result();
     }
+
+
 
     public function list_final_data()
     {
