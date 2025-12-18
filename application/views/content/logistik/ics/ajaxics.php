@@ -153,3 +153,28 @@
 
     });
 </script>
+
+<script>
+    let invalidOnly = {};
+
+    $('.toggle-invalid').on('click', function() {
+        const tableId = $(this).data('target');
+        const table = $('#' + tableId).DataTable();
+
+        invalidOnly[tableId] = !invalidOnly[tableId];
+
+        if (invalidOnly[tableId]) {
+            // Filter hanya CEK ULANG
+            table.column(-1).search('CEK ULANG').draw();
+            $(this).text('Tampilkan Semua Data')
+                .removeClass('btn-warning')
+                .addClass('btn-secondary');
+        } else {
+            // Reset filter
+            table.column(-1).search('').draw();
+            $(this).text('Tampilkan Tidak Valid')
+                .removeClass('btn-secondary')
+                .addClass('btn-warning');
+        }
+    });
+</script>

@@ -101,6 +101,13 @@ $nama_wilayah = $wilayah_opname[$wilayah_id] ?? 'Wilayah Tidak Diketahui';
                                         Input Opname By All Barang
                                     </h4>
                                 </div>
+
+                                <div class="mb-2">
+                                    <button class="btn btn-md btn-warning toggle-invalid" data-target="trackingwil_1">
+                                        Tampilkan Tidak Valid
+                                    </button>
+                                </div>
+
                                 <table id="trackingwil_1" class="table table-bordered table-striped mb-4">
                                     <thead class="table-dark">
                                         <tr>
@@ -133,6 +140,13 @@ $nama_wilayah = $wilayah_opname[$wilayah_id] ?? 'Wilayah Tidak Diketahui';
                                         Input Opname By Expired Date Barang
                                     </h4>
                                 </div>
+
+                                <div class="mb-2">
+                                    <button class="btn btn-md btn-warning toggle-invalid" data-target="trackingwil_2">
+                                        Tampilkan Tidak Valid
+                                    </button>
+                                </div>
+
                                 <table id="trackingwil_2" class="table table-bordered table-striped">
                                     <thead class="table-dark">
                                         <tr>
