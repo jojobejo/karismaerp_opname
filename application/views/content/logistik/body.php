@@ -172,6 +172,8 @@
                             </div>
                         </div> -->
                 </section>
+            <?php elseif ($this->session->userdata('jobdesk') == 'SUPERVISI') : ?>
+
             <?php elseif ($this->session->userdata('jobdesk') == 'STOCKOPNAME') : ?>
                 <!-- END USER ROUTES -->
             <?php endif; ?>

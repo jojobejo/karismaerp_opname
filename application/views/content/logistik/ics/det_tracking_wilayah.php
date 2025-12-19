@@ -57,7 +57,7 @@ $nama_wilayah = $wilayah_opname[$wilayah_id] ?? 'Wilayah Tidak Diketahui';
 
                     <div class="row">
                         <div class="col-auto">
-                            <a href="<?= base_url('tracking_wilayah') ?>" class="btn btn-md btn-primary w-100 mb-3"><i class="fas fa-warehouse"></i> Wilayah</a>
+                            <a href="<?= base_url('admstocktracking') ?>" class="btn btn-md btn-primary w-100 mb-3"><i class="fas fa-warehouse"></i> Wilayah</a>
                         </div>
                     </div>
 
@@ -95,85 +95,103 @@ $nama_wilayah = $wilayah_opname[$wilayah_id] ?? 'Wilayah Tidak Diketahui';
 
                         <div class="card">
                             <div class="card-body">
-                                <div class="mb-1">
-                                    <h4 class="fw-bold">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h4 class="fw-bold mb-0">
                                         <i class="fas fa-boxes"></i>
                                         Input Opname By All Barang
                                     </h4>
-                                </div>
 
-                                <div class="mb-2">
-                                    <button class="btn btn-md btn-warning toggle-invalid" data-target="trackingwil_1">
-                                        Tampilkan Tidak Valid
+                                    <button class="btn btn-sm btn-outline-secondary" data-toggle="collapse" data-target="#collapseAllBarang" aria-expanded="true">
+                                        <i class="fas fa-chevron-up"></i>
                                     </button>
                                 </div>
 
-                                <table id="trackingwil_1" class="table table-bordered table-striped mb-4">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Nama Barang</th>
-                                            <th class="text-center">Qty TIM 1</th>
-                                            <th class="text-center">Qty TIM 2</th>
-                                            <th class="text-center">Status</th>
-                                            <th class="text-center">Keterangan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($wilayah_all as $w1) : ?>
+
+                                <div id="collapseAllBarang" class="collapse show">
+
+                                    <div class="mb-2">
+                                        <button class="btn btn-md btn-warning toggle-invalid" data-target="trackingwil_1">
+                                            Tampilkan Tidak Valid
+                                        </button>
+                                    </div>
+
+                                    <table id="trackingwil_1" class="table table-bordered table-striped mb-4">
+                                        <thead class="table-dark">
                                             <tr>
-                                                <td><?= $w1->nama_barang ?></td>
-                                                <td class="text-center"><?= $w1->qty_fisik_tim1 ?></td>
-                                                <td class="text-center"><?= $w1->qty_fisik_tim2 ?></td>
-                                                <td class="text-center"><?= status_btn($w1->status_opname) ?></td>
-                                                <td class="text-center"><?= ket_btn($w1->keterangan) ?></td>
+                                                <th>Nama Barang</th>
+                                                <th class="text-center">Qty TIM 1</th>
+                                                <th class="text-center">Qty TIM 2</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Keterangan</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($wilayah_all as $w1) : ?>
+                                                <tr>
+                                                    <td><?= $w1->nama_barang ?></td>
+                                                    <td class="text-center"><?= $w1->qty_fisik_tim1 ?></td>
+                                                    <td class="text-center"><?= $w1->qty_fisik_tim2 ?></td>
+                                                    <td class="text-center"><?= status_btn($w1->status_opname) ?></td>
+                                                    <td class="text-center"><?= ket_btn($w1->keterangan) ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
+
                         <div class="card">
                             <div class="card-body">
-                                <div class="mb-1">
-                                    <h4 class="fw-bold">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h4 class="fw-bold mb-0">
                                         <i class="fas fa-calendar"></i>
                                         Input Opname By Expired Date Barang
                                     </h4>
-                                </div>
 
-                                <div class="mb-2">
-                                    <button class="btn btn-md btn-warning toggle-invalid" data-target="trackingwil_2">
-                                        Tampilkan Tidak Valid
+                                    <button class="btn btn-sm btn-outline-secondary" data-toggle="collapse" data-target="#collapseExpired" aria-expanded="true">
+                                        <i class="fas fa-chevron-up"></i>
                                     </button>
                                 </div>
 
-                                <table id="trackingwil_2" class="table table-bordered table-striped">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Nama Barang</th>
-                                            <th class="text-center">Expired Date</th>
-                                            <th class="text-center">Qty TIM 1</th>
-                                            <th class="text-center">Qty TIM 2</th>
-                                            <th class="text-center">Status</th>
-                                            <th class="text-center">Keterangan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($wilayah_fefo as $w2) : ?>
+
+                                <div id="collapseExpired" class="collapse show">
+
+                                    <div class="mb-2">
+                                        <button class="btn btn-md btn-warning toggle-invalid" data-target="trackingwil_2">
+                                            Tampilkan Tidak Valid
+                                        </button>
+                                    </div>
+                                    <table id="trackingwil_2" class="table table-bordered table-striped">
+                                        <thead class="table-dark">
                                             <tr>
-                                                <td><?= $w2->nama_barang ?></td>
-                                                <td class="text-center"><?= date('d-m-Y', strtotime($w2->exp_date)) ?></td>
-                                                <td class="text-center"><?= $w2->qty_fisik_tim1 ?></td>
-                                                <td class="text-center"><?= $w2->qty_fisik_tim2 ?></td>
-                                                <td class="text-center"><?= status_btn($w2->status_opname) ?></td>
-                                                <td class="text-center"><?= ket_btn($w2->keterangan) ?></td>
+                                                <th>Nama Barang</th>
+                                                <th class="text-center">Expired Date</th>
+                                                <th class="text-center">Qty TIM 1</th>
+                                                <th class="text-center">Qty TIM 2</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Keterangan</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($wilayah_fefo as $w2) : ?>
+                                                <tr>
+                                                    <td><?= $w2->nama_barang ?></td>
+                                                    <td class="text-center"><?= date('d-m-Y', strtotime($w2->exp_date)) ?></td>
+                                                    <td class="text-center"><?= $w2->qty_fisik_tim1 ?></td>
+                                                    <td class="text-center"><?= $w2->qty_fisik_tim2 ?></td>
+                                                    <td class="text-center"><?= status_btn($w2->status_opname) ?></td>
+                                                    <td class="text-center"><?= ket_btn($w2->keterangan) ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+
+                                </div>
 
                             </div>
                         </div>
+
 
                     </section>
                 </div>

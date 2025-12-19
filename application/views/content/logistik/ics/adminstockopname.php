@@ -24,7 +24,6 @@
                 <section class="content">
 
                     <div class="row">
-
                         <!-- <div class="col-auto">
                             <a href="<?= base_url('trackingtim/1') ?>" class="btn btn-md btn-primary w-100 mb-3"><i class="fas fa-tasks"></i> Tracking Stock TIM 1</a>
                         </div>

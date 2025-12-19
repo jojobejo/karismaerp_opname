@@ -178,3 +178,9 @@
         }
     });
 </script>
+
+<script>
+    $(document).on('click', '[data-toggle="collapse"]', function() {
+        $(this).find('i').toggleClass('fa-chevron-up fa-chevron-down');
+    });
+</script>

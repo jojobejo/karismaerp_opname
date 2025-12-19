@@ -168,13 +168,13 @@
         </nav>
         <!-- /.sidebar-menu -->
       </div>
-    <?php elseif ($this->session->userdata('lv') == '1' && $this->session->userdata('jobdesk') == 'ADMINKEUTC') : ?>
+    <?php elseif ($this->session->userdata('lv') == '1' && $this->session->userdata('jobdesk') == 'SUPERVISI') : ?>
       <div class="sidebar">
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
-              <a href="<?php echo base_url('keuangan') ?>" class="nav-link">
+              <a href="<?php echo base_url('admstocktracking') ?>" class="nav-link">
                 <i class="nav-icon fas fa-home"></i>
                 <p>
                   Dashboard
@@ -192,6 +192,7 @@
         </nav>
         <!-- /.sidebar-menu -->
       </div>
+
     <?php else : ?>
       <div class="sidebar">
         <!-- Sidebar Menu -->

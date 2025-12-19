@@ -36,6 +36,7 @@ class Auth extends CI_Controller
                         'jobdesk'       => $key->jobdesk,
                         'nama'          => $key->nm_karyawan,
                         'tim'           => $key->tim,
+                        'username'      => $key->username,
                         'wilayah'       => $key->wilayah
                     );
                     $this->session->set_userdata('logged_in', true);
@@ -54,6 +55,8 @@ class Auth extends CI_Controller
                         redirect('keuangan');
                     } else if ($key->jobdesk == 'STOCKOPNAME') {
                         redirect('stockopname');
+                    } else if ($key->jobdesk == 'SUPERVISI') {
+                        redirect('admstocktracking');
                     } else if ($key->jobdesk == 'ADMIN') {
                         redirect('extravaganza');
                     }

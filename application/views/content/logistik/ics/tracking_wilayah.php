@@ -72,8 +72,7 @@
                             13 => 'Gudang C (A7, A8)'
                         ];
                         ?>
-
-
+                        
                         <div class="card">
                             <div class="card-body">
 
