@@ -1788,6 +1788,7 @@ class C_Logistik extends CI_Controller
     }
 
     public function detail_wilayah_opname($id)
+
     {
         $data['page_title']         = 'KARISMA - ICS';
         $data['wilayah_id']        = $id;

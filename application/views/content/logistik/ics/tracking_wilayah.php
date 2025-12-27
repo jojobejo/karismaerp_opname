@@ -69,10 +69,12 @@
                             10 => 'Gudang B 4-5-6-7',
                             11 => 'Gudang B 8-9-10',
                             12 => 'Gudang B 11-12-13',
-                            13 => 'Gudang C (A7, A8)'
+                            13 => 'Gudang C (A7, A8)',
+                            14 => 'Barang Promosi',
+                            15 => 'Barang Rusak, Sparepart, Sample'
                         ];
                         ?>
-                        
+
                         <div class="card">
                             <div class="card-body">
 
