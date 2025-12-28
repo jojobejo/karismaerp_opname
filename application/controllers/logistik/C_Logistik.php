@@ -2137,6 +2137,13 @@ class C_Logistik extends CI_Controller
                 'input_at'    => date('d/m/Y')
             );
 
+            $reqtoics = array(
+                'nama_barang' => $req->nama_barang,
+                'exp_date'    => $req->exp_date,
+                'qty'         => '0',
+                'input_at'    => date('d/m/Y')
+            );
+
             $log = array(
                 'nama_user'   => $req->inputer,
                 'nama_barang' => $req->nama_barang,
@@ -2152,6 +2159,7 @@ class C_Logistik extends CI_Controller
 
             $this->db->insert('tb_ics_opname', $datareq);
             $this->db->insert('tb_log_ics', $log);
+            $this->db->insert('tb_ics', $reqtoics);
             $this->db->where('id', $id)->update('tb_req_opname', [
                 'status'   => 2,
                 'acc_with' => $this->session->userdata('nik')

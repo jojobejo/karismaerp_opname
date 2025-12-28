@@ -179,7 +179,7 @@ $nama_wilayah = $wilayah_opname[$wilayah_id] ?? 'Wilayah Tidak Diketahui';
                                             <?php foreach ($wilayah_fefo as $w2) : ?>
                                                 <tr>
                                                     <td><?= $w2->nama_barang ?></td>
-                                                    <td class="text-center"><?= date('d-m-Y', strtotime($w2->exp_date)) ?></td>
+                                                    <td class="text-center"><?= date('d/m/Y', strtotime($w2->exp_date)) ?></td>
                                                     <td class="text-center"><?= $w2->qty_fisik_tim1 ?></td>
                                                     <td class="text-center"><?= $w2->qty_fisik_tim2 ?></td>
                                                     <td class="text-center"><?= status_btn($w2->status_opname) ?></td>
