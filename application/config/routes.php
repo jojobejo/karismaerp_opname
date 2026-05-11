@@ -83,7 +83,7 @@ $route['gudang/(:any)/suplier/(:any)']              = 'keuangan/C_Keuangan/stock
 // LOGISTIK ICS & OPNAME
 $route['final_result']                              = 'logistik/C_Logistik/final_result_opname';
 $route['ics/(:any)']                                = 'logistik/C_Logistik/ics/$1';
-$route['stockopname']                               = 'logistik/C_Logistik/stockopname';
+// Legacy stockopname route dipindahkan ke modul stockopname/C_Stockopname di bawah.
 $route['detailbarang/(:any)']                       = 'logistik/C_Logistik/detailbarang/$1';
 $route['forminput/(:any)/(:any)']                   = 'logistik/C_Logistik/forminput/$1/$2';
 $route['insertopname']                              = 'logistik/C_Logistik/insertopname';
@@ -278,3 +278,60 @@ $route['extravaganza_registrasi']       = 'extravaganza/C_Extravaganza/registras
 // scedule_direktur
 // $route['schedule_direktur']         = 'schedule/C_Schedule';
 // $route['act_schedule/(:any)']       = 'schedule/C_Schedule/act_schedule/$1';
+
+
+// STOCKOPNAME
+$route['stockopname']                  = 'stockopname/C_Stockopname';
+$route['stockopname/login']            = 'stockopname/C_Stockopname/login';
+$route['stockopname/process']          = 'stockopname/C_Stockopname/process';
+$route['stockopname/login-process']    = 'stockopname/C_Stockopname/login_process';
+$route['stockopname/login_process']    = 'stockopname/C_Stockopname/login_process';
+$route['stockopname/logout']           = 'stockopname/C_Stockopname/logout';
+$route['stockopname/dashboard-stats']  = 'stockopname/C_Stockopname/dashboard_stats';
+$route['stockopname/dashboard-chart']  = 'stockopname/C_Stockopname/dashboard_chart';
+
+$route['stockopname/barang/datatable'] = 'stockopname/C_Stockopname/barang_datatable';
+$route['stockopname/barang/show/(:num)'] = 'stockopname/C_Stockopname/barang_show/$1';
+$route['stockopname/barang/store']     = 'stockopname/C_Stockopname/barang_store';
+$route['stockopname/barang/delete']    = 'stockopname/C_Stockopname/barang_delete';
+$route['stockopname/barang/import']    = 'stockopname/C_Stockopname/barang_import';
+$route['stockopname/barang/search']    = 'stockopname/C_Stockopname/barang_search';
+$route['stockopname/saldo/import']     = 'stockopname/C_Stockopname/saldo_import';
+
+$route['stockopname/session/datatable'] = 'stockopname/C_Stockopname/session_datatable';
+$route['stockopname/session/show/(:num)'] = 'stockopname/C_Stockopname/session_show/$1';
+$route['stockopname/session/store']    = 'stockopname/C_Stockopname/session_store';
+$route['stockopname/session/close']    = 'stockopname/C_Stockopname/session_close';
+$route['stockopname/session/select']   = 'stockopname/C_Stockopname/session_select';
+
+$route['stockopname/assignment/datatable'] = 'stockopname/C_Stockopname/assignment_datatable';
+$route['stockopname/assignment/store'] = 'stockopname/C_Stockopname/assignment_store';
+$route['stockopname/assignment/delete'] = 'stockopname/C_Stockopname/assignment_delete';
+
+$route['stockopname/opname/assignments'] = 'stockopname/C_Stockopname/opname_assignments';
+$route['stockopname/opname/stock-lookup'] = 'stockopname/C_Stockopname/opname_stock_lookup';
+$route['stockopname/opname/save-input'] = 'stockopname/C_Stockopname/opname_save_input';
+
+$route['stockopname/compare/datatable'] = 'stockopname/C_Stockopname/compare_datatable';
+$route['stockopname/compare/generate'] = 'stockopname/C_Stockopname/compare_generate';
+$route['stockopname/compare/recheck'] = 'stockopname/C_Stockopname/compare_recheck';
+$route['stockopname/compare/approve'] = 'stockopname/C_Stockopname/compare_approve';
+$route['stockopname/report/export']    = 'stockopname/C_Stockopname/export_report';
+$route['stockopname/audit/datatable']  = 'stockopname/C_Stockopname/audit_datatable';
+
+$route['stockopname/gudang/datatable'] = 'stockopname/C_Stockopname/gudang_datatable';
+$route['stockopname/gudang/show/(:num)'] = 'stockopname/C_Stockopname/gudang_show/$1';
+$route['stockopname/gudang/store']     = 'stockopname/C_Stockopname/gudang_store';
+$route['stockopname/gudang/delete']    = 'stockopname/C_Stockopname/gudang_delete';
+$route['stockopname/gudang/search']    = 'stockopname/C_Stockopname/gudang_search';
+
+$route['stockopname/lokasi/datatable'] = 'stockopname/C_Stockopname/lokasi_datatable';
+$route['stockopname/lokasi/show/(:num)'] = 'stockopname/C_Stockopname/lokasi_show/$1';
+$route['stockopname/lokasi/store']     = 'stockopname/C_Stockopname/lokasi_store';
+$route['stockopname/lokasi/delete']    = 'stockopname/C_Stockopname/lokasi_delete';
+$route['stockopname/lokasi/search']    = 'stockopname/C_Stockopname/lokasi_search';
+
+$route['stockopname/supplier/select']  = 'stockopname/C_Stockopname/supplier_select';
+$route['stockopname/warehouse/select'] = 'stockopname/C_Stockopname/warehouse_select';
+$route['stockopname/location/select']  = 'stockopname/C_Stockopname/location_select';
+$route['stockopname/checker/select']   = 'stockopname/C_Stockopname/checker_select';
