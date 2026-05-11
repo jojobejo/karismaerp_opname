@@ -51,7 +51,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 */
 
 // Sistem Routes
-$route['default_controller'] = 'Auth';
+$route['default_controller'] = 'HomeStockopname';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
@@ -278,6 +278,7 @@ $route['extravaganza_registrasi']       = 'extravaganza/C_Extravaganza/registras
 // scedule_direktur
 // $route['schedule_direktur']         = 'schedule/C_Schedule';
 // $route['act_schedule/(:any)']       = 'schedule/C_Schedule/act_schedule/$1';
+
 
 
 // STOCKOPNAME

@@ -91,7 +91,13 @@
     setLoading(true);
     try {
       const response = await fetch('<?= site_url('stockopname/login-process') ?>', { method:'POST', body:new FormData(form), credentials:'same-origin' });
-      const json = await response.json();
+      const raw = await response.text();
+      let json;
+      try {
+        json = JSON.parse(raw);
+      } catch (parseError) {
+        throw new Error('Respons login tidak valid. Periksa konfigurasi base URL atau server.');
+      }
       if (!json.status) throw new Error(json.message || 'Login gagal.');
       window.location.href = json.data.redirect || '<?= site_url('stockopname') ?>';
     } catch (error) {
