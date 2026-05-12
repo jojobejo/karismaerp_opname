@@ -5,7 +5,7 @@ class C_Stockopname extends CI_Controller
 {
     private $json_methods = array(
         'process', 'login_process', 'dashboard_stats', 'dashboard_chart',
-        'barang_datatable', 'barang_show', 'barang_store', 'barang_delete', 'barang_import', 'barang_search',
+        'barang_datatable', 'barang_show', 'barang_store', 'barang_delete', 'barang_import', 'barang_search', 'barang_all', 'barang_generate_codes',
         'gudang_datatable', 'gudang_show', 'gudang_store', 'gudang_delete', 'gudang_search',
         'lokasi_datatable', 'lokasi_show', 'lokasi_store', 'lokasi_delete', 'lokasi_search',
         'saldo_import',
@@ -172,6 +172,12 @@ class C_Stockopname extends CI_Controller
         return $this->json($result['status'], $result['message'], isset($result['data']) ? $result['data'] : array());
     }
 
+    public function barang_generate_codes()
+    {
+        $payload = $this->item_payload();
+        return $this->json(true, 'Kode berhasil dibuat.', $this->stockopname->generate_item_codes($payload));
+    }
+
     public function saldo_import()
     {
         if (empty($_FILES['file']['tmp_name'])) {
@@ -331,6 +337,11 @@ class C_Stockopname extends CI_Controller
         return $this->json(true, 'OK', $this->stockopname->search_items($term));
     }
 
+    public function barang_all()
+    {
+        return $this->json(true, 'OK', $this->stockopname->get_all_items_for_print());
+    }
+
     public function gudang_datatable()
     {
         $result = $this->stockopname->datatable_warehouses($this->input->post(null, true));
@@ -436,18 +447,16 @@ class C_Stockopname extends CI_Controller
     private function item_payload()
     {
         return array(
-            'supplier_id' => stockopname_nullable_int($this->input->post('supplier_id', true)),
-            'item_code' => stockopname_clean($this->input->post('item_code', true)),
+            'kd_barang' => stockopname_clean($this->input->post('kd_barang', true)),
+            'kode_barang_system' => stockopname_clean($this->input->post('kode_barang_system', true)),
             'barcode' => stockopname_nullable_text($this->input->post('barcode', true)),
             'qrcode' => stockopname_nullable_text($this->input->post('qrcode', true)),
-            'item_name' => stockopname_clean($this->input->post('item_name', true)),
-            'unit' => stockopname_clean($this->input->post('unit', true)),
-            'weight' => stockopname_decimal($this->input->post('weight', true)),
-            'length' => stockopname_decimal($this->input->post('length', true)),
-            'width' => stockopname_decimal($this->input->post('width', true)),
-            'height' => stockopname_decimal($this->input->post('height', true)),
-            'minimum_stock' => max(0, (int) $this->input->post('minimum_stock', true)),
-            'is_active' => (int) $this->input->post('is_active', true) === 1 ? 1 : 0
+            'nama_barang' => stockopname_clean($this->input->post('nama_barang', true)),
+            'satuan' => stockopname_clean($this->input->post('satuan', true)),
+            'p' => max(0, (int) stockopname_decimal($this->input->post('p', true))),
+            'l' => max(0, (int) stockopname_decimal($this->input->post('l', true))),
+            't' => max(0, (int) stockopname_decimal($this->input->post('t', true))),
+            'berat' => max(0, (int) stockopname_decimal($this->input->post('berat', true)))
         );
     }
 
@@ -479,26 +488,29 @@ class C_Stockopname extends CI_Controller
     private function validate_item($payload, $id)
     {
         $errors = array();
-        if ($payload['item_code'] === '') {
-            $errors['item_code'] = 'Kode barang wajib diisi.';
+        if ($payload['kd_barang'] === '') {
+            $errors['kd_barang'] = 'Kode barang wajib diisi.';
         }
-        if ($payload['item_name'] === '') {
-            $errors['item_name'] = 'Nama barang wajib diisi.';
+        if ($payload['kode_barang_system'] === '') {
+            $errors['kode_barang_system'] = 'Kode barang system wajib diisi.';
         }
-        if ($payload['unit'] === '') {
-            $errors['unit'] = 'Satuan wajib diisi.';
+        if ($payload['nama_barang'] === '') {
+            $errors['nama_barang'] = 'Nama barang wajib diisi.';
         }
-        if ($payload['item_code'] !== '' && $this->stockopname->exists_except('tbopname_item', 'item_code', $payload['item_code'], $id)) {
-            $errors['item_code'] = 'Kode barang sudah digunakan.';
+        if ($payload['satuan'] === '') {
+            $errors['satuan'] = 'Satuan wajib diisi.';
         }
-        if ($payload['barcode'] && $this->stockopname->exists_except('tbopname_item', 'barcode', $payload['barcode'], $id)) {
+        if ($payload['kd_barang'] !== '' && $this->stockopname->exists_except('tb_master_barang_all', 'kd_barang', $payload['kd_barang'], $id)) {
+            $errors['kd_barang'] = 'Kode barang sudah digunakan.';
+        }
+        if ($payload['kode_barang_system'] !== '' && $this->stockopname->exists_except('tb_master_barang_all', 'kode_barang_system', $payload['kode_barang_system'], $id)) {
+            $errors['kode_barang_system'] = 'Kode barang system sudah digunakan.';
+        }
+        if ($payload['barcode'] && $this->stockopname->item_column_exists('barcode') && $this->stockopname->exists_except('tb_master_barang_all', 'barcode', $payload['barcode'], $id)) {
             $errors['barcode'] = 'Barcode sudah digunakan.';
         }
-        if ($payload['qrcode'] && $this->stockopname->exists_except('tbopname_item', 'qrcode', $payload['qrcode'], $id)) {
+        if ($payload['qrcode'] && $this->stockopname->item_column_exists('qrcode') && $this->stockopname->exists_except('tb_master_barang_all', 'qrcode', $payload['qrcode'], $id)) {
             $errors['qrcode'] = 'QRCode sudah digunakan.';
-        }
-        if ($payload['supplier_id'] && !$this->stockopname->row_exists('tbopname_supplier', $payload['supplier_id'])) {
-            $errors['supplier_id'] = 'Supplier tidak valid.';
         }
         return $errors;
     }

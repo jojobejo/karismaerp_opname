@@ -296,7 +296,9 @@ $route['stockopname/barang/show/(:num)'] = 'stockopname/C_Stockopname/barang_sho
 $route['stockopname/barang/store']     = 'stockopname/C_Stockopname/barang_store';
 $route['stockopname/barang/delete']    = 'stockopname/C_Stockopname/barang_delete';
 $route['stockopname/barang/import']    = 'stockopname/C_Stockopname/barang_import';
+$route['stockopname/barang/generate-codes'] = 'stockopname/C_Stockopname/barang_generate_codes';
 $route['stockopname/barang/search']    = 'stockopname/C_Stockopname/barang_search';
+$route['stockopname/barang/all']       = 'stockopname/C_Stockopname/barang_all';
 $route['stockopname/saldo/import']     = 'stockopname/C_Stockopname/saldo_import';
 
 $route['stockopname/session/datatable'] = 'stockopname/C_Stockopname/session_datatable';

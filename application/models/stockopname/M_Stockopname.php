@@ -5,6 +5,11 @@ class M_Stockopname extends CI_Model
 {
     private $column_cache = array();
 
+    public function item_column_exists($column)
+    {
+        return $this->column_exists('tb_master_barang_all', $column);
+    }
+
     public function column_exists($table, $column)
     {
         $key = $table . '.' . $column;
@@ -58,9 +63,12 @@ class M_Stockopname extends CI_Model
             ? $this->db->where('is_active', 1)->count_all_results('tbopname_warehouse')
             : $this->db->count_all('tbopname_warehouse');
 
+        $item_table = 'tb_master_barang_all';
+        $item_count = $this->db->table_exists($item_table) ? (int) $this->db->count_all($item_table) : 0;
+
         return array(
-            'items' => (int) $this->db->count_all('tbopname_item'),
-            'items_active' => (int) $this->db->where('is_active', 1)->count_all_results('tbopname_item'),
+            'items' => $item_count,
+            'items_active' => $item_count,
             'warehouses' => (int) $this->db->count_all('tbopname_warehouse'),
             'warehouses_active' => (int) $warehouse_active,
             'locations' => (int) $this->db->count_all('tbopname_location'),
@@ -83,35 +91,63 @@ class M_Stockopname extends CI_Model
 
     public function datatable_items($request)
     {
-        $columns = array('i.item_code', 'i.item_name', 'i.barcode', 's.supplier_name', 'i.unit', 'i.minimum_stock', 'i.is_active');
-        $builder = function () {
+        $barcode_select = $this->item_column_exists('barcode') ? 'i.barcode' : 'NULL AS barcode';
+        $qrcode_select = $this->item_column_exists('qrcode') ? 'i.qrcode' : 'NULL AS qrcode';
+        $columns = array('i.kd_barang', 'i.kode_barang_system', 'i.nama_barang', 'barcode', 'i.p', 'i.berat');
+        $builder = function () use ($barcode_select, $qrcode_select) {
             $this->db
-                ->select('i.*, s.supplier_name')
-                ->from('tbopname_item i')
-                ->join('tbopname_supplier s', 's.id = i.supplier_id', 'left');
+                ->select('i.id, i.kd_barang, i.kode_barang_system, i.nama_barang, i.satuan, i.p, i.l, i.t, i.berat, ' . $barcode_select . ', ' . $qrcode_select, false)
+                ->from('tb_master_barang_all i');
         };
-        $search = array('i.item_code', 'i.item_name', 'i.barcode', 'i.qrcode', 'i.unit', 's.supplier_name');
+        $search = array('i.kd_barang', 'i.kode_barang_system', 'i.nama_barang', 'i.satuan');
+        if ($this->item_column_exists('barcode')) {
+            $search[] = 'i.barcode';
+        }
+        if ($this->item_column_exists('qrcode')) {
+            $search[] = 'i.qrcode';
+        }
 
         return $this->datatable($request, $columns, $builder, $search, function ($row) {
+            $barcode = isset($row->barcode) ? $row->barcode : '';
+            $qrcode  = isset($row->qrcode)  ? $row->qrcode  : '';
+
+            // Kolom centang — data lengkap di sini, sinkronisasi antrian dikerjakan JS
+            $checkbox = '<label class="d-flex justify-content-center align-items-center mb-0" style="cursor:pointer;min-height:28px">'
+                . '<input type="checkbox" class="js-print-check" style="width:16px;height:16px;cursor:pointer"'
+                . ' data-id="'      . (int) $row->id                        . '"'
+                . ' data-kd="'      . html_escape($row->kd_barang)           . '"'
+                . ' data-kdsys="'   . html_escape($row->kode_barang_system)   . '"'
+                . ' data-nama="'    . html_escape($row->nama_barang)          . '"'
+                . ' data-satuan="'  . html_escape($row->satuan)               . '"'
+                . ' data-barcode="' . html_escape($barcode)                   . '"'
+                . ' data-qrcode="'  . html_escape($qrcode)                    . '"'
+                . '></label>';
+
+            $actions  = '<div class="btn-group btn-group-sm" role="group">';
+            $actions .= '<button type="button" class="btn btn-outline-primary js-edit" data-module="barang" data-id="' . (int) $row->id . '" title="Edit"><i class="fas fa-pen"></i></button>';
+            $actions .= '<button type="button" class="btn btn-outline-danger js-delete" data-module="barang" data-id="' . (int) $row->id . '" title="Hapus"><i class="fas fa-trash"></i></button>';
+            $actions .= '</div>';
+
             return array(
-                html_escape($row->item_code),
-                '<div class="font-weight-600">' . html_escape($row->item_name) . '</div><small class="text-muted">QR: ' . html_escape($row->qrcode ?: '-') . '</small>',
-                html_escape($row->barcode ?: '-'),
-                html_escape($row->supplier_name ?: '-'),
-                html_escape($row->unit),
-                number_format((float) $row->minimum_stock, 0, ',', '.'),
-                stockopname_badge($row->is_active),
-                $this->row_actions($row->id, 'barang')
+                $checkbox,
+                html_escape($row->kd_barang),
+                html_escape($row->kode_barang_system),
+                '<div class="font-weight-600">' . html_escape($row->nama_barang) . '</div><small class="text-muted">Satuan: ' . html_escape($row->satuan) . '</small>',
+                '<div>' . html_escape($barcode ?: '-') . '</div><small class="text-muted">QR: ' . html_escape($qrcode ?: '-') . '</small>',
+                html_escape($row->p . ' x ' . $row->l . ' x ' . $row->t),
+                number_format((float) $row->berat, 0, ',', '.'),
+                $actions
             );
         });
     }
 
     public function get_item($id)
     {
+        $barcode_select = $this->item_column_exists('barcode') ? 'barcode' : 'NULL AS barcode';
+        $qrcode_select = $this->item_column_exists('qrcode') ? 'qrcode' : 'NULL AS qrcode';
         return $this->db
-            ->select('i.*, s.supplier_name')
-            ->from('tbopname_item i')
-            ->join('tbopname_supplier s', 's.id = i.supplier_id', 'left')
+            ->select('id, kd_barang, kode_barang_system, nama_barang, satuan, p, l, t, berat, ' . $barcode_select . ', ' . $qrcode_select, false)
+            ->from('tb_master_barang_all i')
             ->where('i.id', (int) $id)
             ->get()
             ->row();
@@ -119,19 +155,20 @@ class M_Stockopname extends CI_Model
 
     public function save_item($data, $id = 0, $user_id = null)
     {
+        $data = $this->prepare_item_data($data);
         $this->db->trans_begin();
         if ((int) $id > 0) {
-            $this->db->where('id', (int) $id)->update('tbopname_item', $data);
+            $this->db->where('id', (int) $id)->update('tb_master_barang_all', $data);
             $message = 'Barang berhasil diperbarui.';
             $activity = 'UPDATE';
         } else {
-            $this->db->insert('tbopname_item', $data);
+            $this->db->insert('tb_master_barang_all', $data);
             $id = $this->db->insert_id();
             $message = 'Barang berhasil ditambahkan.';
             $activity = 'CREATE';
         }
 
-        $this->log_activity($user_id, 'MASTER_BARANG', $activity, 'tbopname_item', $id, $message);
+        $this->log_activity($user_id, 'MASTER_BARANG', $activity, 'tb_master_barang_all', $id, $message);
         return $this->complete_transaction($message, array('id' => (int) $id));
     }
 
@@ -139,13 +176,12 @@ class M_Stockopname extends CI_Model
     {
         $this->db->trans_begin();
         if ($this->count_item_references($id) > 0) {
-            $this->db->where('id', (int) $id)->update('tbopname_item', array('is_active' => 0));
-            $this->log_activity($user_id, 'MASTER_BARANG', 'DEACTIVATE', 'tbopname_item', $id, 'Barang dinonaktifkan karena masih dipakai transaksi.');
-            return $this->complete_transaction('Barang masih dipakai transaksi, status diubah menjadi nonaktif.');
+            $this->db->trans_rollback();
+            return array('status' => false, 'message' => 'Barang masih dipakai transaksi stock opname dan tidak bisa dihapus.');
         }
 
-        $this->db->where('id', (int) $id)->delete('tbopname_item');
-        $this->log_activity($user_id, 'MASTER_BARANG', 'DELETE', 'tbopname_item', $id, 'Barang dihapus.');
+        $this->db->where('id', (int) $id)->delete('tb_master_barang_all');
+        $this->log_activity($user_id, 'MASTER_BARANG', 'DELETE', 'tb_master_barang_all', $id, 'Barang dihapus.');
         return $this->complete_transaction('Barang berhasil dihapus.');
     }
 
@@ -172,47 +208,45 @@ class M_Stockopname extends CI_Model
             $line++;
             if ($line === 1) {
                 $headers = $this->normalize_import_headers($row);
-                if (in_array('item_code', $headers, true)) {
+                if (in_array('kd_barang', $headers, true)) {
                     continue;
                 }
-                $headers = array('item_code', 'item_name', 'unit', 'barcode', 'qrcode', 'minimum_stock', 'supplier_code');
+                $headers = array('kd_barang', 'kode_barang_system', 'barcode', 'qrcode', 'nama_barang', 'satuan', 'p', 'l', 't', 'berat');
             }
 
             $mapped = $this->map_import_row($headers, $row);
-            if (empty($mapped['item_code']) || empty($mapped['item_name']) || empty($mapped['unit'])) {
+            if (empty($mapped['kd_barang']) || empty($mapped['kode_barang_system']) || empty($mapped['nama_barang']) || empty($mapped['satuan'])) {
                 $skipped++;
                 continue;
             }
 
-            $supplier_id = null;
-            if (!empty($mapped['supplier_code'])) {
-                $supplier_id = $this->supplier_id_by_code($mapped['supplier_code']);
-            }
-
             $payload = array(
-                'supplier_id' => $supplier_id,
-                'item_code' => $mapped['item_code'],
+                'kd_barang' => $mapped['kd_barang'],
+                'kode_barang_system' => $mapped['kode_barang_system'],
                 'barcode' => !empty($mapped['barcode']) ? $mapped['barcode'] : null,
                 'qrcode' => !empty($mapped['qrcode']) ? $mapped['qrcode'] : null,
-                'item_name' => $mapped['item_name'],
-                'unit' => $mapped['unit'],
-                'minimum_stock' => isset($mapped['minimum_stock']) ? (int) $mapped['minimum_stock'] : 0,
-                'is_active' => 1
+                'nama_barang' => $mapped['nama_barang'],
+                'satuan' => $mapped['satuan'],
+                'p' => isset($mapped['p']) ? (int) $mapped['p'] : 0,
+                'l' => isset($mapped['l']) ? (int) $mapped['l'] : 0,
+                't' => isset($mapped['t']) ? (int) $mapped['t'] : 0,
+                'berat' => isset($mapped['berat']) ? (int) $mapped['berat'] : 0
             );
+            $payload = $this->prepare_item_data($payload);
 
-            $existing = $this->db->select('id')->where('item_code', $payload['item_code'])->get('tbopname_item')->row();
+            $existing = $this->db->select('id')->where('kd_barang', $payload['kd_barang'])->get('tb_master_barang_all')->row();
             if ($existing) {
-                $this->db->where('id', $existing->id)->update('tbopname_item', $payload);
+                $this->db->where('id', $existing->id)->update('tb_master_barang_all', $payload);
                 $updated++;
             } else {
-                $this->db->insert('tbopname_item', $payload);
+                $this->db->insert('tb_master_barang_all', $payload);
                 $inserted++;
             }
         }
         fclose($handle);
 
         $message = 'Import selesai. Tambah: ' . $inserted . ', update: ' . $updated . ', dilewati: ' . $skipped . '.';
-        $this->log_activity($user_id, 'MASTER_BARANG', 'IMPORT', 'tbopname_item', null, $message);
+        $this->log_activity($user_id, 'MASTER_BARANG', 'IMPORT', 'tb_master_barang_all', null, $message);
         $result = $this->complete_transaction($message, compact('inserted', 'updated', 'skipped'));
         return $result;
     }
@@ -769,16 +803,52 @@ class M_Stockopname extends CI_Model
 
     public function search_items($term)
     {
-        $this->db->select('id, item_code, item_name, barcode, qrcode, unit')->from('tbopname_item')->where('is_active', 1);
+        $barcode_select = $this->item_column_exists('barcode') ? 'barcode' : 'NULL AS barcode';
+        $qrcode_select = $this->item_column_exists('qrcode') ? 'qrcode' : 'NULL AS qrcode';
+        $this->db->select('id, kd_barang AS item_code, kode_barang_system, nama_barang AS item_name, satuan AS unit, ' . $barcode_select . ', ' . $qrcode_select, false)->from('tb_master_barang_all');
         if ($term !== '') {
             $this->db->group_start()
-                ->like('item_code', $term)
-                ->or_like('item_name', $term)
-                ->or_like('barcode', $term)
-                ->or_like('qrcode', $term)
+                ->like('kd_barang', $term)
+                ->or_like('kode_barang_system', $term)
+                ->or_like('nama_barang', $term);
+            if ($this->item_column_exists('barcode')) {
+                $this->db->or_like('barcode', $term);
+            }
+            if ($this->item_column_exists('qrcode')) {
+                $this->db->or_like('qrcode', $term);
+            }
+            $this->db
                 ->group_end();
         }
-        return $this->db->limit(20)->order_by('item_name', 'ASC')->get()->result();
+        return $this->db->limit(20)->order_by('nama_barang', 'ASC')->get()->result();
+    }
+
+    public function get_all_items_for_print()
+    {
+        $barcode_select = $this->item_column_exists('barcode') ? 'barcode' : 'NULL AS barcode';
+        $qrcode_select  = $this->item_column_exists('qrcode')  ? 'qrcode'  : 'NULL AS qrcode';
+        return $this->db
+            ->select('id, kd_barang, kode_barang_system, nama_barang, satuan, ' . $barcode_select . ', ' . $qrcode_select, false)
+            ->from('tb_master_barang_all')
+            ->order_by('nama_barang', 'ASC')
+            ->get()
+            ->result();
+    }
+
+    public function generate_item_codes($payload = array())
+    {
+        $base = $this->normalize_code_seed(
+            !empty($payload['kd_barang']) ? $payload['kd_barang']
+            : (!empty($payload['kode_barang_system']) ? $payload['kode_barang_system'] : $payload['nama_barang'])
+        );
+        if ($base === '') {
+            $base = 'BRG' . date('ymdHis');
+        }
+
+        return array(
+            'barcode' => 'BC-' . $base,
+            'qrcode' => 'QR-' . $base . '-' . substr(md5($base . microtime(true)), 0, 6)
+        );
     }
 
     public function search_suppliers($term)
@@ -1016,12 +1086,16 @@ class M_Stockopname extends CI_Model
             $value = strtolower(trim((string) $value));
             $value = str_replace(array(' ', '-', '.', '/'), '_', $value);
             $map = array(
-                'kode_barang' => 'item_code',
-                'nama_barang' => 'item_name',
-                'satuan' => 'unit',
-                'stok_minimum' => 'minimum_stock',
-                'minimum_stok' => 'minimum_stock',
-                'kode_supplier' => 'supplier_code'
+                'kode_barang' => 'kd_barang',
+                'item_code' => 'kd_barang',
+                'item_name' => 'nama_barang',
+                'unit' => 'satuan',
+                'kode_system' => 'kode_barang_system',
+                'kode_barang_all_system' => 'kode_barang_system',
+                'panjang' => 'p',
+                'lebar' => 'l',
+                'tinggi' => 't',
+                'weight' => 'berat'
             );
             $headers[] = isset($map[$value]) ? $map[$value] : $value;
         }
@@ -1035,5 +1109,36 @@ class M_Stockopname extends CI_Model
             $mapped[$header] = isset($row[$idx]) ? trim((string) $row[$idx]) : null;
         }
         return $mapped;
+    }
+
+    private function prepare_item_data($data)
+    {
+        $payload = array(
+            'kd_barang' => isset($data['kd_barang']) ? $data['kd_barang'] : '',
+            'kode_barang_system' => isset($data['kode_barang_system']) ? $data['kode_barang_system'] : '',
+            'nama_barang' => isset($data['nama_barang']) ? $data['nama_barang'] : '',
+            'satuan' => isset($data['satuan']) ? $data['satuan'] : '',
+            'p' => isset($data['p']) ? (int) $data['p'] : 0,
+            'l' => isset($data['l']) ? (int) $data['l'] : 0,
+            't' => isset($data['t']) ? (int) $data['t'] : 0,
+            'berat' => isset($data['berat']) ? (int) $data['berat'] : 0
+        );
+
+        if ($this->item_column_exists('barcode')) {
+            $payload['barcode'] = !empty($data['barcode']) ? $data['barcode'] : null;
+        }
+        if ($this->item_column_exists('qrcode')) {
+            $payload['qrcode'] = !empty($data['qrcode']) ? $data['qrcode'] : null;
+        }
+
+        return $payload;
+    }
+
+    private function normalize_code_seed($value)
+    {
+        $value = strtoupper(trim((string) $value));
+        $value = preg_replace('/[^A-Z0-9]+/', '-', $value);
+        $value = trim($value, '-');
+        return substr($value, 0, 40);
     }
 }
